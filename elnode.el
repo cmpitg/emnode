@@ -692,36 +692,35 @@ of succesful parsing."
           (throw 'elnode-parse-http 'header))
         ;; FIXME: we don't handle continuation lines of anything like
         ;; that
-        (let* ((lines
-                (split-string
-                 (buffer-substring (point-min) hdrend)
-                 "\r\n"
-                 't))
+        (let* ((lines (split-string
+                       (buffer-substring (point-min) hdrend)
+                       "\r\n"
+                       't))
                (status (car lines)) ;; the first line is the status line
                (header (cdr lines)) ;; the rest of the lines are the header
-               (header-alist-strings
-                (mapcar
-                 (lambda (hdrline)
-                   (when (string-match
-                          "\\([A-Za-z0-9_-]+\\):[ ]*\\(.*\\)"
-                          hdrline)
-                     (cons
-                      (match-string 1 hdrline)
-                      (match-string 2 hdrline))))
-                 header))
-               (header-alist-syms
-                (mapcar
-                 (lambda (hdr)
-                   (cons (intern (downcase (car hdr)))
-                         (cdr hdr)))
-                 header-alist-strings))
+               (header-alist-strings (mapcar
+                                      (lambda (hdrline)
+                                        (when (string-match
+                                               "\\([A-Za-z0-9_-]+\\):[ ]*\\(.*\\)"
+                                               hdrline)
+                                          (cons
+                                           (match-string 1 hdrline)
+                                           (match-string 2 hdrline))))
+                                      header))
+               (header-alist-syms (mapcar
+                                   (lambda (hdr)
+                                     (cons (intern (downcase (car hdr)))
+                                           (cdr hdr)))
+                                   header-alist-strings))
                (content-len (assq 'content-length header-alist-syms)))
+
           ;; Check the content if we have it.
           (when content-len
             (let* ((available-content (- (point-max) hdrend)))
               (when (> (string-to-number (cdr content-len))
                        available-content)
                 (throw 'elnode-parse-http 'content))))
+
           (process-put httpcon :elnode-header-end hdrend)
           (process-put httpcon :elnode-http-status status)
           (process-put httpcon :elnode-http-header-syms header-alist-syms)
