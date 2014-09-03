@@ -692,7 +692,8 @@ of succesful parsing."
           (throw 'elnode-parse-http 'header))
         ;; FIXME: we don't handle continuation lines of anything like
         ;; that
-        (let* ((lines (split-string
+        (let* ((current-point-header-end (point))
+               (lines (split-string
                        (buffer-substring (point-min) hdrend)
                        "\r\n"
                        't))
@@ -712,21 +713,18 @@ of succesful parsing."
                                      (cons (intern (downcase (car hdr)))
                                            (cdr hdr)))
                                    header-alist-strings))
-               (content-len (assq 'content-length header-alist-syms)))
-
-          ;; Check the content if we have it.
-          (when content-len
-            (let* ((available-content (- (point-max) hdrend)))
-              (when (> (string-to-number (cdr content-len))
-                       available-content)
-                (throw 'elnode-parse-http 'content))))
-
+               (data (buffer-substring current-point-header-end (point-max))))
           (process-put httpcon :elnode-header-end hdrend)
           (process-put httpcon :elnode-http-status status)
           (process-put httpcon :elnode-http-header-syms header-alist-syms)
-          (process-put httpcon :elnode-http-header header-alist-strings)))))
-  ;; Return a symbol to indicate done-ness
+          (process-put httpcon :elnode-http-header header-alist-strings)
+          (process-put httpcon :http-data data)))))
   'done)
+
+(defun elnode:http-data (httpcon)
+  "Return HTTP data/message/body from `httpcon'.  Note that this
+is what the -d/--data directive curl specifies."
+  (process-get httpcon :http-data))
 
 (defun elnode--http-make-hdr (method resource &rest headers)
   "Convenience function to make an HTTP header.
