@@ -1,7 +1,6 @@
-= Elnode =
+= Emnode =
 
 An evented IO webserver in Emacs Lisp.
-
 
 == Requirements ==
 
