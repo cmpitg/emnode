@@ -68,6 +68,16 @@
 (defconst http-referrer 'referer
   "Helper to bypass idiot spelling of the word `referrer'.")
 
+(defconst elnode:+log-none+     0)
+(defconst elnode:+log-info+     1)
+(defconst elnode:+log-warning+  2)
+(defconst elnode:+log-critical+ 3)
+(defconst elnode:+log-debug+    4)
+
+(defvar elnode:*log-level* elnode:+log-info+
+  "Log level.  Default `elnode:+log-info+'.  Valid values:
+`elnode:+log-debug+', `elnode:+log-info+',
+`elnode:+log-warning+', `elnode:+log-critical+', `elnode:+log-none+'")
 
 ;; Extensions to ert
 
@@ -454,13 +464,6 @@ the value of the GUARD."
   "Process the HANDLER with the known open HTTPCON."
   ;; (elnode-error "defer - just before calling the handler %s" handler)
   (funcall handler httpcon))
-
-
-;; Log levels
-(defconst elnode-log-debug 0)
-(defconst elnode-log-info 1)
-(defconst elnode-log-warning 2)
-(defconst elnode-log-critical 3)
 
 (defvar elnode-defer-processor-log-level elnode-log-critical
   "Log level of the defer processor.")
