@@ -610,40 +610,42 @@ The function `elnode-send-status' also uses these."
 
 (defun elnode--sentinel (process status)
   "Sentinel function for the main server and for the client sockets."
-  (elnode-error
-   "elnode--sentinel '%s' for process  %s with buffer %s"
-   (elnode-trunc status)
-   (process-name process)
-   (process-buffer process))
+  (when (>= elnode:*log-level* elnode:+log-info+)
+    (elnode-error
+     "elnode--sentinel '%s' for process  %s with buffer %s"
+     (elnode-trunc status)
+     (process-name process)
+     (process-buffer process)))
   (cond
-   ;; Server status
-   ((and
-     (assoc (process-contact process :service) elnode-server-socket)
-     (equal status "deleted\n"))
-    (if (equal
-	 (process-buffer
-	  ;; Get the server process
-	  (cdr (assoc 
-		(process-contact process :service)
-		elnode-server-socket)))
-	 (process-buffer process))
-	(message "found the server process - NOT deleting")
-      (message "aha! deleting the connection process")
-      (kill-buffer (process-buffer process)))
-    (elnode-error "Elnode server stopped"))
+    ;; Server status
+    ((and
+      (assoc (process-contact process :service) elnode-server-socket)
+      (equal status "deleted\n"))
+     (if (equal
+          (process-buffer
+           ;; Get the server process
+           (cdr (assoc 
+                 (process-contact process :service)
+                 elnode-server-socket)))
+          (process-buffer process))
+         (message "found the server process - NOT deleting")
+         (message "aha! deleting the connection process")
+         (kill-buffer (process-buffer process)))
+     (elnode-error "Elnode server stopped"))
 
-   ;; Client socket status
-   ((equal status "connection broken by remote peer\n")
-    (when (process-buffer process)
-      (kill-buffer (process-buffer process))
-      (elnode-error "Elnode connection dropped %s" process)))
+    ;; Client socket status
+    ((equal status "connection broken by remote peer\n")
+     (when (process-buffer process)
+       (kill-buffer (process-buffer process))
+       (elnode-error "Elnode connection dropped %s" process)))
    
-   ((equal status "open\n") ;; this says "open from ..."
-    (elnode-error "Elnode opened new connection"))
+    ((equal status "open\n") ;; this says "open from ..."
+     (elnode-error "Elnode opened new connection"))
 
-   ;; Default
-   (t
-    (elnode-error "Elnode status: %s %s" process (elnode-trim status)))))
+    ;; Default
+    (t
+     (when (>= elnode:*log-level* elnode:+log-info+)
+       (elnode-error "Elnode status: %s %s" process (elnode-trim status))))))
 
 (defun elnode--process-send-string (proc data)
   "Elnode adapter for `process-send-string'.
@@ -663,7 +665,8 @@ connection) in a way that chunked encoding is endeed properly.
 
 This is used by `elnode-worker-elisp' to implement a protocol for
 sending data through an elnode connection transparently."
-  (elnode-error "elnode--process-send-eof on %s" proc)
+  (when (>= elnode:*log-level* elnode:+log-info+)
+    (elnode-error "elnode--process-send-eof on %s" proc))
   (elnode-http-send-string proc "")
   ;;(process-send-string proc "\r\n")
   (elnode--http-end proc))
@@ -795,9 +798,11 @@ Does any necessary encoding."
 
 (defun elnode--handler-call (handler process)
   "Simple function to wrap calling the HANDLER."
-  (elnode-error "filter: calling handler on %s" process)
+  (when (>= elnode:*log-level* elnode:+log-info+)
+    (elnode-error "filter: calling handler on %s" process))
   (funcall handler process)
-  (elnode-error "filter: handler returned on %s" process))
+  (when (>= elnode:*log-level* elnode:+log-info+)
+    (elnode-error "filter: handler returned on %s" process)))
 
 (defun elnode--filter (process data)
   "Filtering DATA sent from the client PROCESS..
@@ -1639,9 +1644,10 @@ which will be returned."
 (defun elnode-http-send-string (httpcon str)
   "Send STR to HTTPCON, doing chunked encoding."
   (if elnode--http-send-string-debug
-      (elnode-error
-       "elnode-http-send-string %s [[%s]]"
-       httpcon (elnode-trunc str)))
+      (when (>= elnode:*log-level* elnode:+log-info+)
+        (elnode-error
+         "elnode-http-send-string %s [[%s]]"
+         httpcon (elnode-trunc str))))
   (let ((len (string-bytes str)))
     (process-put httpcon :elnode-bytes-written
                  (+ len (or (process-get httpcon :elnode-bytes-written) 0)))
@@ -1770,28 +1776,29 @@ The status and the header are also stored on the process as meta
 data.  This is done mainly for testing infrastructure."
   (if (process-get httpcon :elnode-http-started)
       (elnode-error "Http already started on %s" httpcon)
-    ;; Send the header
-    (elnode-error "starting HTTP response on %s" httpcon)
-    (let ((header-alist
-           (append (process-get httpcon :elnode-headers-to-set) header))
-          (status-code (if (stringp status)
-                           (string-to-number status)
-                           status)))
-      ;; Store the meta data about the response.
-      (process-put httpcon :elnode-httpresponse-status status-code)
-      (process-put httpcon :elnode-httpresponse-header header-alist)
-      (process-send-string
-       httpcon
-       (format
-        "HTTP/1.1 %d %s\r\n%s\r\n"
-        status-code
-        ;; The status text
-        (assoc-default status-code elnode-http-codes-alist)
-        ;; The header
-        (or
-         (elnode--http-result-header header-alist)
-         "\r\n")))
-      (process-put httpcon :elnode-http-started 't))))
+      ;; Send the header
+      (when (>= elnode:*log-level* elnode:+log-info+)
+        (elnode-error "starting HTTP response on %s" httpcon))
+      (let ((header-alist
+             (append (process-get httpcon :elnode-headers-to-set) header))
+            (status-code (if (stringp status)
+                             (string-to-number status)
+                             status)))
+        ;; Store the meta data about the response.
+        (process-put httpcon :elnode-httpresponse-status status-code)
+        (process-put httpcon :elnode-httpresponse-header header-alist)
+        (process-send-string
+         httpcon
+         (format
+          "HTTP/1.1 %d %s\r\n%s\r\n"
+          status-code
+          ;; The status text
+          (assoc-default status-code elnode-http-codes-alist)
+          ;; The header
+          (or
+           (elnode--http-result-header header-alist)
+           "\r\n")))
+        (process-put httpcon :elnode-http-started 't))))
 
 (defun elnode--http-end (httpcon)
   "We need a special end function to do the emacs clear up.
@@ -1799,16 +1806,18 @@ data.  This is done mainly for testing infrastructure."
 This makes access log file calls if the socket has a property
 `:elnode-access-log-name'.  The property is taken to be the name
 of a buffer."
-  (elnode-error "elnode--http-end ending socket %s" httpcon)
+  (when (>= elnode:*log-level* elnode:+log-info+)
+    (elnode-error "elnode--http-end ending socket %s" httpcon))
   (let ((access-log-name (process-get httpcon :elnode-access-log-name)))
     (when access-log-name
       (condition-case err
           (elnode-log-access access-log-name httpcon)
         (error
-         (message
-          (concat
-           "elnode--http-end: an error occurred "
-           "processing the access log"))))))
+         (when (>= elnode:*log-level* elnode:+log-warning+)
+           (message
+            (concat
+             "elnode--http-end: an error occurred "
+             "processing the access log")))))))
   (condition-case nil
       (process-send-eof httpcon)
     (error (message "elnode--http-endL could not send EOF")))
