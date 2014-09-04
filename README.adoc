@@ -64,10 +64,11 @@ Try:
 [source,sh,linenums]
 ----
 curl 0:9999/eval/ -d 'message-box "Hello World"'
-curl 0:9999/eval -d 'message-box "Hello World"'
+curl 0:9999/eval -d '(message-box "Hello") (message-box "World)"'
 curl 0:9999/open//tmp/
-echo """(message-box \"Hello\") (message-box \"World\")""" > /tmp/tmp.el
+echo '(message-box "Hello") (message-box "World")' >! /tmp/tmp.el
 curl 0:9999/exec//tmp/tmp.el
+
 ----
 
 == TODOs
