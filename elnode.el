@@ -53,8 +53,9 @@
 (require 'ert) ; we provide some assertions and need 'should'
 (eval-when-compile (require 'cl))
 
-(defconst EMNODE-FORM-DATA-TYPE "application/x-www-form-urlencoded"
-  "The type of HTTP Form POSTs.")
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; Const and customization
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 (defconst http-referrer 'referer
   "Helper to bypass idiot spelling of the word `referrer'.")
@@ -80,6 +81,8 @@
 This is an alist of proc->server-process:
 
   (port . process)")
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 ;;;###autoload
 (defconst emnode-config-directory
