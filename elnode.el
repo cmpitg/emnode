@@ -1,10 +1,11 @@
 ;;; elnode.el --- a simple emacs async HTTP server -*- lexical-binding: t -*-
 
 ;; Copyright (C) 2010, 2011, 2012  Nic Ferrier
+;; Copyright (C) 2014  Duong H. Nguyen
 
 ;; Author: Nic Ferrier <nferrier@ferrier.me.uk>
-;; Maintainer: Nic Ferrier <nferrier@ferrier.me.uk>
-;; Created: 5th October 2010
+;;         Duong H. Nguyen <cmpitg@gmail.com>
+;; Maintainer: Duong H. Nguyen <cmpitg@gmail.com>
 ;; Keywords: lisp, http, hypermedia
 
 ;; This file is NOT part of GNU Emacs.
@@ -24,29 +25,19 @@
 
 ;;; Source code
 ;;
-;; elnode's code can be found here:
-;;   http://github.com/nicferrier/elnode
-
-;;; Style note
-;;
-;; This codes uses the Emacs style of:
-;;
-;;    elnode--private-function
-;;
-;; for private functions.
-
+;; emnode's code can be found here:
+;;   http://github.com/cmpitg/emnode
 
 ;;; Commentary:
 ;;
-;; This is an elisp version of the popular node.js asynchronous
-;; webserver toolkit.
+;; This is an Emacs Lisp version of the popular node.js asynchronous webserver
+;; toolkit.
 ;;
-;; You can define HTTP request handlers and start an HTTP server
-;; attached to the handler.  Many HTTP servers can be started, each
-;; must have it's own TCP port.  Handlers can defer processing with a
-;; signal (which allows comet style resource management)
+;; You can define HTTP request handlers and start an HTTP server attached to
+;; the handler.  Many HTTP servers can be started, each must have it's own TCP
+;; port.  Handlers can defer processing with a signal (which allows comet
+;; style resource management)
 ;;
-;; See elnode-start for how to start an HTTP server.
 
 ;;; Code:
 
