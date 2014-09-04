@@ -70,22 +70,6 @@
 `emnode:+log-debug+', `emnode:+log-info+',
 `emnode:+log-warning+', `emnode:+log-critical+', `emnode:+log-none+'")
 
-;; Extensions to ert
-
-(defmacro should-equal (a b)
-  "Simple shortcut for `(should (equal a b))'."
-  `(should
-    (equal ,a ,b)))
-
-(defmacro should-match (regex a)
-  "Simple shortcut for a `string-match' with `should'."
-  `(should
-   (string-match
-    ,regex
-    ,a)))
-
-;; Customization stuff
-
 (defgroup emnode nil
   "An extensible asynchronous web server for Emacs."
   :group 'applications)
@@ -1150,9 +1134,8 @@ whole body of the RESPONSE."
                       (cdr reqd-hdr)
                       (assoc-default (car reqd-hdr) hdr)) 0))))))
        (when ,body-matchv
-         (should-match
-          ,body-matchv
-          (plist-get ,responsev :result-string))))))
+         (should (string-match ,body-matchv
+                               (plist-get ,responsev :result-string)))))))
 
 (defun emnode--log-fn (server con msg)
   "Log function for emnode.
