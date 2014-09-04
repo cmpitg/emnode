@@ -3,13 +3,13 @@
 A fork of https://github.com/nicferrier/elnode[Elnode] with bugs fixed,
 cleaner APIs, better organized code.
 
-== Current improvements over Elnode
+== Current changes over Elnode
 
 * Basic support for log level with +elnode:*log-level*+.
 * Support for HTTP data/body retrieving with +elnode:http-data+.
+* No more Wiki thing.
+* Renaming +elnode+ to +emnode+.
 
 == TODOs
 
-* No more Wiki thing, just pure HTTP server.
 * Clean-up APIs, re-organize to have good convention.
-* Renaming +elnode+ to +emnode+.
