@@ -51,6 +51,7 @@
 (require 'db)
 (require 'dired) ; needed for the setup
 (require 'ert) ; we provide some assertions and need 'should'
+(require 's)
 (eval-when-compile (require 'cl))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -82,8 +83,6 @@ This is an alist of proc->server-process:
 
   (port . process)")
 
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
 ;;;###autoload
 (defconst emnode-config-directory
   (expand-file-name (concat user-emacs-directory "emnode/"))
@@ -96,6 +95,7 @@ emnode webserver has a docroot directory in this directory).
 It is based on the `user-emacs-directory' which always seems to
 be set, even when emacs is started with -Q.")
 
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 ;; Error log handling
 
@@ -104,13 +104,6 @@ be set, even when emacs is started with -Q.")
   (replace-regexp-in-string
    "[\r\n]" "."
    (substring data 0 (if (> 20 (length data)) (length data) 20))))
-
-(defun emnode-trim (str)
-  "Trim off whitespace."
-  (string-match "[ \t\n\r]*$" str)
-  (setq str (replace-match "" nil nil str))
-  (string-match "^[ \t\n\r]*" str)
-  (replace-match "" nil nil str))
 
 (defun emnode-join (&rest parts)
   "Path join the parts together.
@@ -623,7 +616,7 @@ The function `emnode-send-status' also uses these."
     ;; Default
     (t
      (when (>= emnode:*log-level* emnode:+log-info+)
-       (emnode-error "Emnode status: %s %s" process (emnode-trim status))))))
+       (emnode-error "Emnode status: %s %s" process (s-trim status))))))
 
 (defun emnode--process-send-string (proc data)
   "Emnode adapter for `process-send-string'.
