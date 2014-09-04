@@ -1196,7 +1196,7 @@ Example:
 
   (defun nic-server (httpcon)
     (emnode:http-start httpcon 200 '(\"Content-Type\" . \"text/html\"))
-    (emnode-http-return httpcon \"<html><b>BIG!</b></html>\"))
+    (emnode:http-end httpcon \"<html><b>BIG!</b></html>\"))
   (emnode-start 'nic-server)
 
 Now visit http://127.0.0.1:8000
@@ -1791,7 +1791,7 @@ of a buffer."
   (delete-process httpcon)
   (kill-buffer (process-buffer httpcon)))
 
-(defun emnode-http-return (httpcon &optional data)
+(defun emnode:http-end (httpcon &optional data)
   "End the response on HTTPCON optionally sending DATA first.
 
 HTTPCON is the http connection which must have had the headers
@@ -1812,7 +1812,7 @@ DATA must be a string, it's just passed to `emnode-http-send'."
 (defun emnode-send-html (httpcon html)
   "Simple send for HTML."
   (emnode:http-start httpcon 200 '("Content-Type" . "text/html"))
-  (emnode-http-return httpcon html))
+  (emnode:http-end httpcon html))
 
 (defun emnode-json-fix (data)
   "Fix JSON "
@@ -1849,7 +1849,7 @@ name \"callback\" is used."
     (emnode:http-start
      httpcon 200
      `("Content-type" . ,(or content-type "application/json")))
-    (emnode-http-return
+    (emnode:http-end
      httpcon
      (if jsonp
          (format
@@ -1870,7 +1870,7 @@ table.
 
 Optionally include MSG."
   (emnode:http-start httpcon status '("Content-type" . "text/html"))
-  (emnode-http-return httpcon
+  (emnode:http-end httpcon
                       (emnode--format-response status msg)))
 
 (defun emnode-send-404 (httpcon &optional msg)
@@ -1898,7 +1898,7 @@ If TYPE is non-nil, use it as a status code.  Defaults to 302 -
 permanent redirect."
   (let ((status-code (or type 302)))
     (emnode:http-start httpcon status-code `("Location" . ,location))
-    (emnode-http-return
+    (emnode:http-end
      httpcon
      (format "<h1>redirecting you to %s</h1>\r\n" location))))
 
@@ -2221,7 +2221,7 @@ table.  It calls `emnode-hostpath-dispatcher' with
            (emnode-http-send-string
             ,hv
             (buffer-substring (point-min) (point-max)))
-           (emnode-http-return ,hv))))))
+           (emnode:http-end ,hv))))))
 
 
 ;; Emnode child process functions
@@ -2662,7 +2662,7 @@ delivered."
         (when preamble (emnode-http-send-string httpcon preamble))
         (if (or emnode-webserver-visit-file replacements)
             (let ((file-buf (find-file-noselect filename)))
-              (emnode-http-return
+              (emnode:http-end
                httpcon
                (emnode--buffer-template
                 file-buf
@@ -2999,7 +2999,7 @@ handlers."
                             targetfile
                             pathinfo)))
                 (emnode:http-start httpcon 200 '("Content-type" . "text/html"))
-                (emnode-http-return httpcon index))))
+                (emnode:http-end httpcon index))))
         ;; Send a file.
         (emnode-send-file
          httpcon
@@ -3307,7 +3307,7 @@ This function sends the contents of the custom variable
   (emnode:http-start httpcon 200 `("Content-type" . "text/html"))
   ;; It would be nice to support preambles... not sure how.
   ;;  (when preamble (emnode-http-send-string httpcon preamble))
-  (emnode-http-return
+  (emnode:http-end
    httpcon
    (with-temp-buffer
      (insert emnode-auth-login-page)

@@ -27,8 +27,8 @@ Taken from my config.  Actually we could do better than this:
                              (s-ends-with?   ")" expr)))
                    (format "(%s)" expr)
                    expr)))
-    (emnode-http-start httpcon 200 '("Content-Type" . "text/plain"))
-    (emnode-http-return httpcon (format "> Eval'ing: %s" sexp))
+    (emnode:http-start httpcon 200 '("Content-Type" . "text/plain"))
+    (emnode:http-end httpcon (format "> Eval'ing: %s" sexp))
     (unless (zerop (length (s-trim expr)))
       (with-temp-buffer
         (insert expr)
@@ -36,14 +36,14 @@ Taken from my config.  Actually we could do better than this:
 
 (defun ~ipc-open-file (httpcon)
   (let ((path (emnode:http-get-arg httpcon 1)))
-    (emnode-http-start httpcon 200 '("Content-Type" . "text/plain"))
-    (emnode-http-return httpcon (format "> Opening: %s" path))
+    (emnode:http-start httpcon 200 '("Content-Type" . "text/plain"))
+    (emnode:http-end httpcon (format "> Opening: %s" path))
     (find-file path)))
 
 (defun ~ipc-exec-file (httpcon)
   (let ((path (emnode:http-get-arg httpcon 1)))
-    (emnode-http-start httpcon 200 '("Content-Type" . "text/plain"))
-    (emnode-http-return httpcon (format "> Executing: %s" path))
+    (emnode:http-start httpcon 200 '("Content-Type" . "text/plain"))
+    (emnode:http-end httpcon (format "> Executing: %s" path))
     (with-temp-buffer
       (insert-file-contents path)
       (eval-buffer))))
