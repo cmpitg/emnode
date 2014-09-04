@@ -76,3 +76,8 @@ curl 0:9999/exec//tmp/tmp.el
 * Clean-up APIs, re-organize to have good convention.
 * Better names
 * Higher level APIs.
+
+=== Documentation
+
+* Get argument: +emnode:http-get-arg+
+* HTTP data/message/body: +emnode:http-data+
