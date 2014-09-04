@@ -10,6 +10,68 @@ cleaner APIs, better organized code.
 * No more Wiki thing.
 * Renaming +elnode+ to +emnode+.
 
+== Example
+
+Taken from my config.  Actually we could do better than this:
+
+[source,lisp,linenums]
+----
+(setq *emnode-routes*
+      '(("^.*//eval/?"         . ~ipc-eval)
+        ("^.*//open/\\(.*\\)"  . ~ipc-open-file)
+        ("^.*//exec/\\(.*\\)"  . ~ipc-exec-file)))
+
+(defun ~ipc-eval (httpcon)
+  (let* ((expr (format "%s" (emnode:http-data httpcon)))
+         (sexp (if (not (and (s-starts-with? "(" expr)
+                             (s-ends-with?   ")" expr)))
+                   (format "(%s)" expr)
+                   expr)))
+    (emnode-http-start httpcon 200 '("Content-Type" . "text/plain"))
+    (emnode-http-return httpcon (format "> Eval'ing: %s" sexp))
+    (unless (zerop (length (s-trim expr)))
+      (with-temp-buffer
+        (insert expr)
+        (eval-buffer)))))
+
+(defun ~ipc-open-file (httpcon)
+  (let ((path (emnode-http-mapping httpcon 1)))
+    (emnode-http-start httpcon 200 '("Content-Type" . "text/plain"))
+    (emnode-http-return httpcon (format "> Opening: %s" path))
+    (find-file path)))
+
+(defun ~ipc-exec-file (httpcon)
+  (let ((path (emnode-http-mapping httpcon 1)))
+    (emnode-http-start httpcon 200 '("Content-Type" . "text/plain"))
+    (emnode-http-return httpcon (format "> Executing: %s" path))
+    (with-temp-buffer
+      (insert-file-contents path)
+      (eval-buffer))))
+
+(use-package emnode
+  :load-path "/m/src/emnode"
+  :config
+  (progn
+    (setq emnode:*log-level* emnode:+log-none+)
+    (emnode-stop 9999)
+    (emnode-start (lambda (httpcon)
+                    (emnode-hostpath-dispatcher httpcon *emnode-routes*))
+                  :port 9999)))
+----
+
+Try:
+
+[source,sh,linenums]
+----
+curl 0:9999/eval/ -d 'message-box "Hello World"'
+curl 0:9999/eval -d 'message-box "Hello World"'
+curl 0:9999/open//tmp/
+echo """(message-box \"Hello\") (message-box \"World\")""" > /tmp/tmp.el
+curl 0:9999/exec//tmp/tmp.el
+----
+
 == TODOs
 
 * Clean-up APIs, re-organize to have good convention.
+* Better names
+* Higher level APIs.
