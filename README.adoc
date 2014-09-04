@@ -10,5 +10,6 @@ cleaner APIs, better organized code.
 
 == TODOs
 
+* No more Wiki thing, just pure HTTP server.
 * Clean-up APIs, re-organize to have good convention.
 * Renaming +elnode+ to +emnode+.
