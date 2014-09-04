@@ -1,4 +1,4 @@
-;;; elnode.el --- a simple emacs async HTTP server -*- lexical-binding: t -*-
+;;; emnode.el --- a simple emacs async HTTP server -*- lexical-binding: t -*-
 
 ;; Copyright (C) 2010, 2011, 2012  Nic Ferrier
 ;; Copyright (C) 2014  Duong H. Nguyen
@@ -3611,4 +3611,4 @@ This is autoloading mechanics, see the eval-after-load for doing init.")
 
 (provide 'emnode)
 
-;;; elnode.el ends here
+;;; emnode.el ends here
