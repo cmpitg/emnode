@@ -1044,7 +1044,7 @@ to external processes."
                        (buffer-substring-no-properties (point-min) (point-max)))
                      :buffer
                      (process-buffer http-connection)
-                     ;; These properties are set by emnode-http-start
+                     ;; These properties are set by emnode:http-start
                      :status
                      (process-get
                       http-connection
@@ -1189,13 +1189,13 @@ REQUEST-HANDLER is a function which is called with the request.
 The function is called with one argument, which is the
 http-connection.
 
-You can use functions such as `emnode-http-start' and
+You can use functions such as `emnode:http-start' and
 `emnode-http-send-body' to send the http response.
 
 Example:
 
   (defun nic-server (httpcon)
-    (emnode-http-start httpcon 200 '(\"Content-Type\" . \"text/html\"))
+    (emnode:http-start httpcon 200 '(\"Content-Type\" . \"text/html\"))
     (emnode-http-return httpcon \"<html><b>BIG!</b></html>\"))
   (emnode-start 'nic-server)
 
@@ -1644,9 +1644,9 @@ DATA should be a string to be used as the value of the cookie.
 
 Other key values are standard cookie attributes.
 
-Use this with `emnode-http-start' to make cookie headers:
+Use this with `emnode:http-start' to make cookie headers:
 
- (emnode-http-start
+ (emnode:http-start
     httpcon 200
     '(content-type . \"text/html\")
     (emnode-http-cookie-make \"pi\" 3.14579)
@@ -1689,7 +1689,7 @@ with any requested headers and sent.
 If the response has been started it is an error to try to set a
 header.  This function will log the error and return `nil'.
 
-See `emnode-http-start'."
+See `emnode:http-start'."
   (if (process-get httpcon :emnode-http-started)
       (emnode-error "can't set header, HTTP already started on %s" httpcon)
       (let ((headers (process-get httpcon :emnode-headers-to-set)))
@@ -1725,7 +1725,7 @@ header names, against values which should be strings."
                 (error "unsupported header type")))))
           (cdr p)))))
 
-(defun emnode-http-start (httpcon status &rest header)
+(defun emnode:http-start (httpcon status &rest header)
   "Start the http response on the specified http connection.
 
 HTTPCON is the HTTP connection being handled.
@@ -1737,7 +1737,7 @@ HEADER is a sequence of (`header-name' . `value') pairs.
 
 For example:
 
- (emnode-http-start httpcon \"200\" '(\"Content-type\" . \"text/html\"))
+ (emnode:http-start httpcon \"200\" '(\"Content-type\" . \"text/html\"))
 
 The status and the header are also stored on the process as meta
 data.  This is done mainly for testing infrastructure."
@@ -1795,7 +1795,7 @@ of a buffer."
   "End the response on HTTPCON optionally sending DATA first.
 
 HTTPCON is the http connection which must have had the headers
-sent with `emnode-http-start'
+sent with `emnode:http-start'
 
 DATA must be a string, it's just passed to `emnode-http-send'."
   (if (not (process-get httpcon :emnode-http-started))
@@ -1811,7 +1811,7 @@ DATA must be a string, it's just passed to `emnode-http-send'."
 
 (defun emnode-send-html (httpcon html)
   "Simple send for HTML."
-  (emnode-http-start httpcon 200 '("Content-Type" . "text/html"))
+  (emnode:http-start httpcon 200 '("Content-Type" . "text/html"))
   (emnode-http-return httpcon html))
 
 (defun emnode-json-fix (data)
@@ -1846,7 +1846,7 @@ HTTPCON and the value of that used.  If neither the JSONP
 parameter, not the HTTP parameter `callback' is present that the
 name \"callback\" is used."
   (let ((json-to-send (emnode-json-fix data)))
-    (emnode-http-start
+    (emnode:http-start
      httpcon 200
      `("Content-type" . ,(or content-type "application/json")))
     (emnode-http-return
@@ -1869,7 +1869,7 @@ is sent by looking up the STATUS in the `emnode-default-response'
 table.
 
 Optionally include MSG."
-  (emnode-http-start httpcon status '("Content-type" . "text/html"))
+  (emnode:http-start httpcon status '("Content-type" . "text/html"))
   (emnode-http-return httpcon
                       (emnode--format-response status msg)))
 
@@ -1897,7 +1897,7 @@ Optionally include MSG."
 If TYPE is non-nil, use it as a status code.  Defaults to 302 -
 permanent redirect."
   (let ((status-code (or type 302)))
-    (emnode-http-start httpcon status-code `("Location" . ,location))
+    (emnode:http-start httpcon status-code `("Location" . ,location))
     (emnode-http-return
      httpcon
      (format "<h1>redirecting you to %s</h1>\r\n" location))))
@@ -2658,7 +2658,7 @@ delivered."
                          mime-types)))
                  (mm-default-file-encoding targetfile)
                   "application/octet-stream")))
-        (emnode-http-start httpcon 200 `("Content-type" . ,mimetype))
+        (emnode:http-start httpcon 200 `("Content-type" . ,mimetype))
         (when preamble (emnode-http-send-string httpcon preamble))
         (if (or emnode-webserver-visit-file replacements)
             (let ((file-buf (find-file-noselect filename)))
@@ -2998,7 +2998,7 @@ handlers."
                             docroot
                             targetfile
                             pathinfo)))
-                (emnode-http-start httpcon 200 '("Content-type" . "text/html"))
+                (emnode:http-start httpcon 200 '("Content-type" . "text/html"))
                 (emnode-http-return httpcon index))))
         ;; Send a file.
         (emnode-send-file
@@ -3304,7 +3304,7 @@ which is the URL to redirect to when login is successful.
 
 This function sends the contents of the custom variable
 `emnode-auth-login-page' after templating it."
-  (emnode-http-start httpcon 200 `("Content-type" . "text/html"))
+  (emnode:http-start httpcon 200 `("Content-type" . "text/html"))
   ;; It would be nice to support preambles... not sure how.
   ;;  (when preamble (emnode-http-send-string httpcon preamble))
   (emnode-http-return
