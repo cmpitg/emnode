@@ -35,13 +35,13 @@ Taken from my config.  Actually we could do better than this:
         (eval-buffer)))))
 
 (defun ~ipc-open-file (httpcon)
-  (let ((path (emnode-http-mapping httpcon 1)))
+  (let ((path (emnode:http-get-arg httpcon 1)))
     (emnode-http-start httpcon 200 '("Content-Type" . "text/plain"))
     (emnode-http-return httpcon (format "> Opening: %s" path))
     (find-file path)))
 
 (defun ~ipc-exec-file (httpcon)
-  (let ((path (emnode-http-mapping httpcon 1)))
+  (let ((path (emnode:http-get-arg httpcon 1)))
     (emnode-http-start httpcon 200 '("Content-Type" . "text/plain"))
     (emnode-http-return httpcon (format "> Executing: %s" path))
     (with-temp-buffer

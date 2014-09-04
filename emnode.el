@@ -1943,9 +1943,9 @@ that you can access that in your handler with something like:
 
 Returns the handler function that mapped, or `nil'.
 
-This function also establishes the `:emnode-http-mapping'
+This function also establishes the `:http-args'
 property, adding it to the HTTPCON so it can be accessed from
-inside your handler with `emnode-http-mapping'."
+inside your handler with `emnode:http-get-arg'."
   ;; First find the mapping in the mapping table
   (let ((m (emnode--mapper-find-mapping path mapping-table)))
     ;; Now work out if we found one and what it was mapped to
@@ -1956,7 +1956,7 @@ inside your handler with `emnode-http-mapping'."
       ;; Make the match parts accessible
       (process-put
        httpcon
-       :emnode-http-mapping
+       :http-args
        (when (string-match (car m) path)
          (loop for i from 0 to (- (/ (length (match-data path)) 2) 1)
                collect (match-string i path))))
@@ -1968,7 +1968,7 @@ inside your handler with `emnode-http-mapping'."
        ((functionp (symbol-value (cdr m)))
         (symbol-value (cdr m)))))))
 
-(defun emnode-http-mapping (httpcon &optional part)
+(defun emnode:http-get-arg (httpcon &optional part)
   "Return the match on the HTTPCON that resulted in the current handler.
 
 With PART it returns a specific part of the match , by default
@@ -1988,12 +1988,12 @@ and the request:
 The following is true inside the handler:
 
  (equal \"/somedir/somefile.jpg\"
-        (match-string 1 (emnode-http-mapping httpcon)))
+        (match-string 1 (emnode:http-get-arg httpcon)))
 
 The function `emnode-test-path' uses this facility to work out a
 target path."
   (elt
-   (process-get httpcon :emnode-http-mapping)
+   (process-get httpcon :http-args)
    (if part part 0)))
 
 (defun emnode--strip-leading-slash (str)
@@ -2013,7 +2013,7 @@ pathinfo of the request.
 
 The resulting file is NOT checked for existance or safety."
   (let* ((pathinfo (emnode-http-pathinfo httpcon))
-         (path (emnode-http-mapping httpcon 1))
+         (path (emnode:http-get-arg httpcon 1))
          (targetfile
           (emnode-join
            (expand-file-name docroot)
