@@ -3544,8 +3544,34 @@ SCHEME is the authentication scheme to use as defined by
    :parameters (list (cons "username" username)
                      (cons "password" password))))
 
-;;; Main customization stuff
+(defun* emnode:start-server (routes &key (port 9999))
+  "Simple way Emnode server with route table.  `routes' must be
+of the following format:
 
+'\(\(regexp-path-1 . handler-1\)
+  \(regexp-path-2 . handler-2\)
+  ...\)
+
+Each handler is a function that takes `httpcon' as its argument,
+and uses `emnode:http-start' and `emnode:http-end' to response.
+
+E.g.
+
+\(defun handle-/ \(httpcon\)
+  \(emnode:http-start httpcon 200 '\(\"Content-Type\" . \"text/plain\"\)\)
+  \(emnode:http-end httpcon \"Hello World\"\)\)
+
+\(setq *route-table*
+      '\(\(\"^.*/\" . handle-/\)\)\)
+
+\(emnode:start-server *route-table* :port 8088\)
+"
+  (emnode-start (lambda (httpcon)
+                  (emnode-hostpath-dispatcher httpcon routes))
+                :port port))
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; Main customization stuff
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 (defcustom emnode-init-port 8000
   "The port that `emnode-init' starts the default server on."
   :group 'emnode)
