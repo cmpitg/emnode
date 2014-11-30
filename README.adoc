@@ -5,10 +5,13 @@ cleaner APIs, better organized code.
 
 == Current changes over Elnode
 
+* No authentication.
 * Basic support for log level with +elnode:*log-level*+.
 * Support for HTTP data/body retrieving with +elnode:http-data+.
-* No more Wiki thing.
+* No more Wiki.
 * Renaming +elnode+ to +emnode+.
+
+No fancy features, it does exactly what a simple webserver does.
 
 == Example
 
