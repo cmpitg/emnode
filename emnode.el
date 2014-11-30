@@ -49,9 +49,10 @@
 (require 'web)
 (require 'json)
 (require 'db)
-(require 'dired) ; needed for the setup
-(require 'ert) ; we provide some assertions and need 'should'
+(require 'dired)
+(require 'ert)
 (require 's)
+
 (eval-when-compile (require 'cl))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
