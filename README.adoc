@@ -15,7 +15,22 @@ No fancy features, it does exactly what a simple webserver does.
 
 == Example
 
-Taken from my config.  Actually we could do better than this:
+Simplest example:
+
+[source,lisp,linenums]
+----
+(defun handle-/ (httpcon)
+  (emnode:http-start httpcon 200 '("Content-Type" . "text/plain"))
+  (emnode:http-end httpcon "Hello World"))
+
+(setq *route-table*
+      '(("^.*/" . handle-/)))
+
+(emnode:start-server *route-table* :port 8088)
+----
+
+The following one is taken from my config.  Actually we could do better than
+this:
 
 [source,lisp,linenums]
 ----
