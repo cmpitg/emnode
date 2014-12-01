@@ -1265,17 +1265,17 @@ emnode servers on the same port on different hosts."
       (message "deleting server process")
       (delete-process (cdr server))
       (setq emnode:server-socket
-	    ;; remove-if
-	    (let ((test (lambda (elem)
-			  (= (car elem) port)))
-		  (l emnode:server-socket)
-		  result)
-	      (while (car l)
-		(let ((p (pop l))
-		      (r (cdr l)))
-		  (if (not (funcall test p))
-		      (setq result (cons p result)))))
-	      result)))))
+            ;; remove-if
+            (let ((test (lambda (elem)
+                          (= (car elem) port)))
+                  (l emnode:server-socket)
+                  result)
+              (while (car l)
+                (let ((p (pop l))
+                      (r (cdr l)))
+                  (if (not (funcall test p))
+                      (setq result (cons p result)))))
+              result)))))
 
 (defun emnode-find-free-service ()
   "Return a free (unused) TCP port.
