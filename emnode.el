@@ -1251,7 +1251,7 @@ emnode servers on the same port on different hosts."
              emnode:server-socket)))))
 
 ;; TODO: make this take an argument for the
-(defun emnode-stop (port)
+(defun emnode:stop (port)
   "Stop the emnode server attached to PORT."
   (interactive (let ((prt
                       (string-to-number
