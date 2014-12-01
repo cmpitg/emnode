@@ -2131,7 +2131,7 @@ authentications."
         :function-404 function-404
         :extra-table extra-table)))))
 
-(defun emnode--hostpath (host path)
+(defun emnode:->hostpath (host path)
   "Turn the host and path into a hostpath."
   (format
    "%s/%s"
@@ -2164,7 +2164,7 @@ LOG-NAME is an optional log-name.
 AUTH-SCHEME is an optional authentication scheme, defined with
 `emnode-defauth', which specifies a redirect mapping for
 authentications."
-  (let ((hostpath (emnode--hostpath
+  (let ((hostpath (emnode:->hostpath
                    (emnode-http-header httpcon "Host")
                    (emnode-http-pathinfo httpcon)))
         (extra-table
