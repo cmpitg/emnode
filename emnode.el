@@ -743,7 +743,7 @@ added or content length computed."
 (defun emnode--get-server-prop (process key)
   "Get the value of the KEY from the server attached to PROCESS.
 
-Server properties are bound with `emnode-start' which sets up
+Server properties are bound with `emnode:start' which sets up
 `emnode--log-fn' to ensure that all sockets created have a link
 back to the server."
   (let* ((server (process-get process :server))
@@ -1176,7 +1176,7 @@ Serves only to connect the server process to the client processes"
            (switch-to-buffer (current-buffer))))))
 
 ;;;###autoload
-(defun* emnode-start (request-handler
+(defun* emnode:start (request-handler
                       &key
                       port
                       (host "localhost")
@@ -1198,7 +1198,7 @@ Example:
   (defun nic-server (httpcon)
     (emnode:http-start httpcon 200 '(\"Content-Type\" . \"text/html\"))
     (emnode:http-end httpcon \"<html><b>BIG!</b></html>\"))
-  (emnode-start 'nic-server)
+  (emnode:start 'nic-server)
 
 Now visit http://127.0.0.1:8000
 
@@ -1324,8 +1324,9 @@ The port is chosen randomly from the ephemeral ports. "
   "Basic TIME-STR to time encoding."
   (apply 'encode-time (parse-time-string time-str)))
 
-
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; HTTP API methods
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 (defun emnode--http-hdr (httpcon)
   "Return the header cons for the HTTPCON.
@@ -3044,7 +3045,7 @@ directory."
     (add-to-list
      'emnode--make-webserver-store
      (cons docroot webserver-proc))
-    (emnode-start webserver-proc :port port)))
+    (emnode:start webserver-proc :port port)))
 
 ;;;###autoload
 (defun emnode-webserver (httpcon)
@@ -3566,7 +3567,7 @@ E.g.
 
 \(emnode:start-server *route-table* :port 8088\)
 "
-  (emnode-start (lambda (httpcon)
+  (emnode:start (lambda (httpcon)
                   (emnode-hostpath-dispatcher httpcon routes))
                 :port port))
 
@@ -3593,7 +3594,7 @@ the handler and listening on `emnode-init-host'"
   (interactive)
   (if emnode-init-port
       (condition-case nil
-          (emnode-start
+          (emnode:start
            'emnode-hostpath-default-handler
            :port emnode-init-port
            :host emnode-init-host)
