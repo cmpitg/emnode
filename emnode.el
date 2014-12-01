@@ -77,7 +77,7 @@
   "An extensible asynchronous web server for Emacs."
   :group 'applications)
 
-(defvar emnode-server-socket nil
+(defvar emnode:server-socket nil
   "Where we store the server sockets.
 
 This is an alist of proc->server-process:
@@ -591,14 +591,14 @@ The function `emnode-send-status' also uses these."
   (cond
     ;; Server status
     ((and
-      (assoc (process-contact process :service) emnode-server-socket)
+      (assoc (process-contact process :service) emnode:server-socket)
       (equal status "deleted\n"))
      (if (equal
           (process-buffer
            ;; Get the server process
            (cdr (assoc 
                  (process-contact process :service)
-                 emnode-server-socket)))
+                 emnode:server-socket)))
           (process-buffer process))
          (message "found the server process - NOT deleting")
          (message "aha! deleting the connection process")
@@ -1151,7 +1151,7 @@ Serves only to connect the server process to the client processes"
 
 (defun emnode-ports ()
   "List of all ports currently in use by emnode."
-  (mapcar 'car emnode-server-socket))
+  (mapcar 'car emnode:server-socket))
 
 ;;;###autoload
 (defun emnode-list ()
@@ -1162,7 +1162,7 @@ Serves only to connect the server process to the client processes"
     (unwind-protect
          (let ((inhibit-read-only t))
            (erase-buffer)
-           (loop for server in emnode-server-socket
+           (loop for server in emnode:server-socket
               do
                 (destructuring-bind (port . socket-proc) server
                   (let ((fn (process-get socket-proc :emnode-http-handler)))
@@ -1224,9 +1224,9 @@ emnode servers on the same port on different hosts."
      (list (intern handler) :port port :host host)))
   (let ((port (or port 8000))
         (host (or host "localhost")))
-    (unless (assoc port emnode-server-socket)
+    (unless (assoc port emnode:server-socket)
       ;; Add a new server socket to the list
-      (setq emnode-server-socket
+      (setq emnode:server-socket
             (cons
              (cons port
                    (let ((buf (get-buffer-create "*emnode-webserver*")))
@@ -1248,7 +1248,7 @@ emnode servers on the same port on different hosts."
                       :plist (list
                               :emnode-http-handler request-handler
                               :emnode-defer-mode defer-mode))))
-             emnode-server-socket)))))
+             emnode:server-socket)))))
 
 ;; TODO: make this take an argument for the
 (defun emnode-stop (port)
@@ -1260,15 +1260,15 @@ emnode servers on the same port on different hosts."
                         (mapcar (lambda (n) (format "%d" n))
                                 (emnode-ports))))))
                  (list prt)))
-  (let ((server (assoc port emnode-server-socket)))
+  (let ((server (assoc port emnode:server-socket)))
     (when server
       (message "deleting server process")
       (delete-process (cdr server))
-      (setq emnode-server-socket
+      (setq emnode:server-socket
 	    ;; remove-if
 	    (let ((test (lambda (elem)
 			  (= (car elem) port)))
-		  (l emnode-server-socket)
+		  (l emnode:server-socket)
 		  result)
 	      (while (car l)
 		(let ((p (pop l))
