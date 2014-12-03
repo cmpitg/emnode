@@ -3592,16 +3592,6 @@ function will launch a server on it.
 The server is started with `emnode-hostpath-default-handler' as
 the handler and listening on `emnode-init-host'"
   (interactive)
-  (if emnode-init-port
-      (condition-case nil
-          (emnode:start
-           'emnode-hostpath-default-handler
-           :port emnode-init-port
-           :host emnode-init-host)
-        (error
-         (emnode-error
-          "emnode-init: can't start - port %d has something attached already"
-          emnode-init-port))))
   ;; Turn on the defer queue processor if we need to
   (if emnode-defer-on
       (if (not emnode--defer-timer)
