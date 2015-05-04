@@ -3151,24 +3151,6 @@ The AUTH-DB is an `db', by default it is
 
 See `emnode-auth-login' for how this is updated.")
 
-
-(progn
-  ;; Sets up the emnode auth errors
-  (put 'emnode-auth-credentials
-       'error-conditions
-       '(error emnode emnode-auth emnode-auth-credentials))
-  (put 'emnode-auth-credentials
-       'error-message
-       "Emnode authentication failed")
-
-  ;; For failing cookies
-  (put 'emnode-auth-token
-       'error-conditions
-       '(error emnode emnode-auth emnode-auth-token))
-  (put 'emnode-auth-token
-       'error-message
-       "Emnode authentication failed"))
-
 (defun* emnode-auth-login (username
                            password
                            &key
@@ -3498,52 +3480,6 @@ If the auth fails then evaluate ANONYMOUS instead."
               (progn ,@anonymous)))
            ;; Not a cookie test - not sure what to do...
            (message "EMNODE AUTH IF - NOT COOKIE!")))))
-
-(defmacro with-emnode-auth (httpcon scheme &rest body)
-  "Protect code with authentication using HTTPCON and SCHEME.
-
-This macro protects code in a handler with a check for an
-authenticated request (the check is configurable).  If the check
-fails then an appropriate action is taken; for example, sending a
-login page.
-
-SCHEME is the authentication scheme to use as defined by
-`emnode-auth-define-scheme'."
-  (declare
-   (debug (sexp sexp &rest form))
-   (indent 2))
-  (let ((httpconv (make-symbol "httpconv")))
-    `(let ((,httpconv ,httpcon))
-       (if-emnode-auth ,httpconv ,scheme
-         ,@body
-         (let ((to
-                (cond
-                  (;; We have a wrapper... other lists other
-                   ;; than wrappers are probably possible; we
-                   ;; should qualify the test here to be
-                   ;; wrapper specific
-                   (listp (plist-get scheme-list :redirect))
-                   (format
-                    "%s?redirect=%s"
-                    (elt (plist-get scheme-list :redirect) 3)
-                    (emnode-http-pathinfo ,httpconv)))
-                  ;; A plain string can be used directly
-                  ((stringp (plist-get scheme-list :redirect))
-                   (plist-get scheme-list :redirect))
-                  (t
-                   (error
-                    ":redirect MUST be  a list or a string")))))
-           (emnode-send-redirect ,httpconv to))))))
-
-(defun emnode-test-login (auth target username password)
-  "Send a test login to Emnode."
-  ;; FIXME - use AUTH as a reference to an emnode-authentication
-  ;; declaration and pull things like /login/ from it
-  (emnode-test-call
-   (format "/login/?redirect=%s" target)
-   :method "POST"
-   :parameters (list (cons "username" username)
-                     (cons "password" password))))
 
 (defun* emnode:start-server (routes &key (port 9999))
   "Simple way Emnode server with route table.  `routes' must be
