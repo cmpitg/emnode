@@ -1,7 +1,7 @@
 ;;; emnode.el --- a simple emacs async HTTP server -*- lexical-binding: t -*-
 
 ;; Copyright (C) 2010, 2011, 2012  Nic Ferrier
-;; Copyright (C) 2014  Duong H. Nguyen
+;; Copyright (C) 2014-2015  Duong H. Nguyen
 
 ;; Author: Nic Ferrier <nferrier@ferrier.me.uk>
 ;;         Duong H. Nguyen <cmpitg@gmail.com>
@@ -3571,8 +3571,10 @@ E.g.
                   (emnode-hostpath-dispatcher httpcon routes))
                 :port port))
 
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; Main customization stuff
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;; Main customization
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
 (defcustom emnode-init-port 8000
   "The port that `emnode-init' starts the default server on."
   :group 'emnode)
@@ -3609,8 +3611,7 @@ hostpath regexs to handler functions. By default emnode ships
 with this customization setup to serve the document root defined
 in `emnode-webserver-docroot', which by default is ~/public_html."
   :group 'emnode
-  :type '(boolean)
-  )
+  :type '(boolean))
 
 (defvar emnode--inited nil
   "Records when emnode is initialized.
